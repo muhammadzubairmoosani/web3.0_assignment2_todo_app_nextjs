@@ -1,13 +1,7 @@
-import { AddTodo } from "./addTodo";
 import { TodoList } from "./TodoList";
 
-const Page = async () => {
-  return (
-    <div>
-      <AddTodo />
-      <TodoList />
-    </div>
-  );
+const Page = (): JSX.Element => {
+  return <TodoList />;
 };
 
 export default Page;

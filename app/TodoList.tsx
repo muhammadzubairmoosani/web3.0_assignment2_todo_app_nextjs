@@ -1,42 +1,69 @@
-import { ReactElement } from "react";
+"use client";
+
+import { Fragment, useState } from "react";
+import { AddTodo } from "./addTodo";
 import { CompletedTodo } from "./completedTodo";
 import { DeleteTodo } from "./deleteTodo";
 import { EditTodo } from "./editTodo";
 
-type Todos = {
+export type Todo = {
   content: string;
   isCompleted: boolean;
-  id: string;
-  imgUrl: string;
+  id: number;
 };
 
-const getTodos = async () => {
-  const todos = await fetch(
-    "https://631ddaa7789612cd07b19f53.mockapi.io/todos/"
-  );
-  return todos.json();
-};
+export const TodoList = (): JSX.Element => {
+  const [todos, setTodo] = useState<Todo[] | []>([]);
 
-export const TodoList: any = async (): Promise<ReactElement> => {
-  const todos: Todos[] = await getTodos();
+  const _setTodo = (todo: Todo) => {
+    todo.id = todos.length;
+    setTodo([...todos, todo]);
+  };
+
+  const edit = (todo: Todo) => {
+    const newTodo = todos.filter(
+      (_todo: { id: number }) => _todo.id !== todo.id
+    );
+    newTodo.splice(todo.id, 0, todo);
+    setTodo(newTodo);
+  };
+
+  const onDelete = (id: number) => {
+    todos.splice(id, 1);
+    setTodo(todos);
+  };
+
+  const completed = (todo: Todo) => {
+    let newTodos = todos.filter(
+      (_todo: { id: number }) => _todo.id !== todo.id
+    );
+    newTodos.splice(todo.id, 0, todo);
+    setTodo(newTodos);
+  };
+
   return (
-    <table>
-      <tbody>
-        {todos.map((todo) => (
-          <tr key={todo.id}>
-            <td>
-              <CompletedTodo todoId={todo.id} isCompleted={todo.isCompleted} />
-            </td>
-            <td>{todo.content}</td>
-            <td>
-              <EditTodo todo={todo} />
-            </td>
-            <td>
-              <DeleteTodo todoId={todo.id} />
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    <Fragment>
+      <AddTodo setTodo={_setTodo} />
+      <table>
+        <tbody>
+          {!todos.length
+            ? "Add your first todo"
+            : todos.map((todo: Todo) => (
+                <tr key={todo.id}>
+                  <td>
+                    <CompletedTodo setCompleted={completed} todo={todo} />
+                  </td>
+                  <td>{todo.content}</td>
+                  <td>
+                    <EditTodo setEdit={edit} todo={todo} />
+                  </td>
+                  <td>
+                    <DeleteTodo onDelete={() => onDelete(todo.id)} />
+                  </td>
+                </tr>
+              ))}
+        </tbody>
+      </table>
+    </Fragment>
   );
 };

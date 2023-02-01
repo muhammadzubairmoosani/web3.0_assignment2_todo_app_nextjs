@@ -1,19 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import "./modal.scss";
+import { Todo } from "./TodoList";
 
-type Todo = {
-  content: string;
-  isCompleted: boolean;
-  id: string;
-} | null;
-
-export const EditTodo = ({ todo }: { todo: Todo }) => {
-  const { refresh: routerRefresh } = useRouter();
+export const EditTodo = ({
+  todo,
+  setEdit,
+}: {
+  todo: Todo;
+  setEdit: (p: Todo) => void;
+}): JSX.Element => {
   const [modal, setModal] = useState<boolean>(false);
-  const [todoState, setTodoState] = useState<Todo>(null);
+  const [todoState, setTodoState] = useState<Todo | null>(null);
 
   useEffect(() => {
     if (todoState === null) {
@@ -21,19 +20,8 @@ export const EditTodo = ({ todo }: { todo: Todo }) => {
     }
   }, []);
 
-  const _editTodo = async () => {
-    await fetch(
-      `https://631ddaa7789612cd07b19f53.mockapi.io/todos/${todo?.id}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(todoState),
-      }
-    );
-
-    routerRefresh();
+  const onEdit = () => {
+    setEdit(todoState);
     setModal(false);
   };
   return (
@@ -55,7 +43,7 @@ export const EditTodo = ({ todo }: { todo: Todo }) => {
                 setTodoState({ ...todoState, content: e.target.value })
               }
             />
-            <button onClick={_editTodo}>Submit</button>
+            <button onClick={onEdit}>Submit</button>
           </div>
         </div>
       )}

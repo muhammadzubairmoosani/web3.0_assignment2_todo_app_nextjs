@@ -1,29 +1,22 @@
 "use client";
 
 import { useState, Fragment } from "react";
-import { useRouter } from "next/navigation";
+import { Todo } from "./TodoList";
 
-export const AddTodo = (): JSX.Element => {
+export const AddTodo = ({
+  setTodo,
+}: {
+  setTodo: (p: Todo) => void;
+}): JSX.Element => {
   const [content, setContent] = useState<string>("");
-  const { refresh: routerRefresh } = useRouter();
 
-  const _addTodo = async () => {
-    const response = await fetch(
-      `https://631ddaa7789612cd07b19f53.mockapi.io/todos/`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ content }),
-      }
-    );
-    const success = await response.json();
-
-    if (success) {
-      routerRefresh();
-      setContent("");
-    }
+  const addTodo = async () => {
+    setTodo({
+      content,
+      isCompleted: false,
+      id: Date.now(),
+    });
+    setContent("");
   };
 
   return (
@@ -35,7 +28,7 @@ export const AddTodo = (): JSX.Element => {
           setContent(e.target.value)
         }
       />
-      <button disabled={!content} onClick={_addTodo}>
+      <button disabled={!content} onClick={addTodo}>
         Add
       </button>
     </Fragment>
